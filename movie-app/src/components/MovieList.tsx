@@ -1,5 +1,5 @@
 import MovieCard from "./MovieCard";
-import type { Movie } from "../App";
+import type { Movie } from "../types";
 
 type MovieListProps = {
   movies: Movie[];
@@ -7,7 +7,11 @@ type MovieListProps = {
 
 function MovieList({ movies }: MovieListProps) {
   if (movies.length === 0) {
-    return <p className="empty-message">No movies found. Try another filter!</p>;
+    return (
+      <p className="empty-message">
+        No movies found. Try changing your filters!
+      </p>
+    );
   }
 
   return (

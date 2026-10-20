@@ -1,48 +1,69 @@
-import { useState, type FormEvent } from "react";
+import {
+  useState,
+  type FormEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+} from "react-router-dom";
+
 import MovieList from "./components/MovieList";
 import Filter from "./components/Filter";
+import MovieDetails from "./MovieDetails";
+import type { Movie } from "./types";
 import "./App.css";
-
-export type Movie = {
-  id: number;
-  title: string;
-  description: string;
-  posterURL: string;
-  rating: number;
-};
 
 const initialMovies: Movie[] = [
   {
     id: 1,
     title: "Inception",
-    description: "A thief enters people's dreams to steal secrets.",
-    posterURL: "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+    description:
+      "A skilled thief enters people's dreams to steal secrets. He is offered a chance to erase his past by completing an almost impossible mission.",
+    posterURL:
+      "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
     rating: 8.8,
+    trailerURL: "https://www.youtube.com/embed/YoHD9XEInc0",
   },
   {
     id: 2,
     title: "Interstellar",
-    description: "Explorers travel through space to find a new home for humanity.",
-    posterURL: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    description:
+      "When Earth faces an environmental crisis, a group of explorers travels through a wormhole to search for a new home for humanity.",
+    posterURL:
+      "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
     rating: 8.7,
+    trailerURL: "https://www.youtube.com/embed/zSWdZVtXT7E",
   },
   {
     id: 3,
     title: "The Dark Knight",
-    description: "Batman faces the dangerous criminal known as the Joker.",
-    posterURL: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    description:
+      "Batman faces the Joker, a criminal mastermind whose chaotic plans threaten Gotham City.",
+    posterURL:
+      "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     rating: 9.0,
+    trailerURL: "https://www.youtube.com/embed/EXeTwQWrcwY",
   },
 ];
 
-function App() {
-  const [movies, setMovies] = useState<Movie[]>(initialMovies);
+function HomePage({
+  movies,
+  setMovies,
+}: {
+  movies: Movie[];
+  setMovies: Dispatch<SetStateAction<Movie[]>>;
+}) {
   const [titleFilter, setTitleFilter] = useState("");
   const [ratingFilter, setRatingFilter] = useState(0);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [posterURL, setPosterURL] = useState("");
+  const [trailerURL, setTrailerURL] = useState("");
   const [rating, setRating] = useState("7");
 
   const filteredMovies = movies.filter(
@@ -59,6 +80,7 @@ function App() {
       title: title.trim(),
       description: description.trim(),
       posterURL: posterURL.trim(),
+      trailerURL: trailerURL.trim(),
       rating: Number(rating),
     };
 
@@ -67,6 +89,7 @@ function App() {
     setTitle("");
     setDescription("");
     setPosterURL("");
+    setTrailerURL("");
     setRating("7");
   }
 
@@ -74,7 +97,7 @@ function App() {
     <main className="app">
       <header className="app-header">
         <h1>🎬 MovieVerse</h1>
-        <p>Your favorite movies and TV shows, all in one place.</p>
+        <p>Discover your favorite movies and watch their trailers.</p>
       </header>
 
       <section className="add-movie">
@@ -100,6 +123,14 @@ function App() {
             placeholder="Poster image URL"
             value={posterURL}
             onChange={(event) => setPosterURL(event.target.value)}
+            required
+          />
+
+          <input
+            type="url"
+            placeholder="YouTube embed link (https://www.youtube.com/embed/...)"
+            value={trailerURL}
+            onChange={(event) => setTrailerURL(event.target.value)}
             required
           />
 
@@ -137,6 +168,34 @@ function App() {
         <MovieList movies={filteredMovies} />
       </section>
     </main>
+  );
+}
+
+function App() {
+  const [movies, setMovies] = useState<Movie[]>(initialMovies);
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={<HomePage movies={movies} setMovies={setMovies} />}
+        />
+        <Route
+          path="/movie/:id"
+          element={<MovieDetails movies={movies} />}
+        />
+        <Route
+          path="*"
+          element={
+            <main className="app">
+              <h1>Page not found</h1>
+              <Link to="/">Return to Home</Link>
+            </main>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
